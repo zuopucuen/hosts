@@ -14,9 +14,9 @@ typedef struct {
 } hosts_domain_t;
 
 typedef struct {
-    char *ip;
-    char *annotation;
-    int  domain_sum;
+    char           *ip;
+    char           *annotation;
+    int             domain_sum;
     hosts_domain_t *domain;
     void *next;
 } hosts_line_t;
@@ -24,17 +24,20 @@ typedef struct {
 char *get_token(char *p, char *token_begin)
 {
     char *token;
+
     if ((token = malloc(p - token_begin + 1)) == NULL) {
         printf("malloc mem error!\n");
         exit(1);
     }
+
     memcpy(token, token_begin, p - token_begin);
     token[p - token_begin] = '\0';
 
     return token;
 }
 
-hosts_domain_t *add_domain(hosts_line_t *hosts_line, hosts_domain_t *hosts_domain, char *token) 
+hosts_domain_t *add_domain(hosts_line_t *hosts_line, 
+    hosts_domain_t *hosts_domain, char *token) 
 {
     hosts_domain_t *next_hosts_domain;
 
@@ -50,6 +53,7 @@ hosts_domain_t *add_domain(hosts_line_t *hosts_line, hosts_domain_t *hosts_domai
     }
 
     hosts_domain = next_hosts_domain;
+    hosts_domain->next = NULL;
     hosts_domain->domain = token;
 
     return hosts_domain;
@@ -57,6 +61,7 @@ hosts_domain_t *add_domain(hosts_line_t *hosts_line, hosts_domain_t *hosts_domai
 
 hosts_line_t *init_hosts_line() {
     hosts_line_t *hosts_line;
+
     if ((hosts_line = malloc(sizeof(hosts_line_t))) == NULL) {
         printf("malloc mem error!\n");
         exit(1);
@@ -80,6 +85,8 @@ hosts_line_t *load_hosts()
     hosts_domain_t *hosts_domain;
 
     hosts_domain = NULL;
+    token_begin = NULL;
+    annotation_begin = NULL;
 
     fp = fopen(HOSTS_FILE, "r");
     if (fp == NULL) {
@@ -102,9 +109,6 @@ hosts_line_t *load_hosts()
 
     p[file_size + 1] = LF;
     end = p + file_size;
-
-    token_begin = NULL;
-    annotation_begin = NULL;
 
     fread(p, file_size, 1, fp);
     fclose(fp);
